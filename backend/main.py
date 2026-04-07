@@ -34,8 +34,14 @@ model_service: ModelService = None
 @app.on_event("startup")
 def load_models():
     global model_service
-    model_service = ModelService()
-    print("🚀 SentinelNet AI Backend ready!")
+    try:
+        model_service = ModelService()
+        print("🚀 SentinelNet AI Backend ready!")
+    except Exception as e:
+        print(f"❌ ERROR loading models: {e}")
+        import traceback
+        traceback.print_exc()
+        raise  # Re-raise so we know there's an issue
 
 
 # ─── Request/Response Models ───

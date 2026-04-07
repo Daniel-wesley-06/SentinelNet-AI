@@ -24,20 +24,51 @@ class ModelService:
         config_dir = base_dir / "config"
         data_dir = base_dir.parent / "data"
 
-        # Load models
-        self.pipeline = joblib.load(models_dir / "preprocessing_pipeline_final.joblib")
-        self.iforest = joblib.load(models_dir / "isolation_forest_final.joblib")
-        self.svm = joblib.load(models_dir / "oneclass_svm_final.joblib")
+        print(f"🔍 Loading models from: {models_dir}")
+        print(f"🔍 Loading data from: {data_dir}")
+
+        # Check if directories exist
+        if not models_dir.exists():
+            raise FileNotFoundError(f"Models directory not found: {models_dir}")
+        if not data_dir.exists():
+            raise FileNotFoundError(f"Data directory not found: {data_dir}")
+
+        # Load models with error handling
+        try:
+            self.pipeline = joblib.load(models_dir / "preprocessing_pipeline_final.joblib")
+            print(f"✅ Loaded preprocessing pipeline")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Preprocessing pipeline not found: {e}")
+
+        try:
+            self.iforest = joblib.load(models_dir / "isolation_forest_final.joblib")
+            print(f"✅ Loaded isolation forest model")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Isolation forest model not found: {e}")
+
+        try:
+            self.svm = joblib.load(models_dir / "oneclass_svm_final.joblib")
+            print(f"✅ Loaded SVM model")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"SVM model not found: {e}")
 
         # Load ensemble config
-        with open(config_dir / "ensemble_config.json", "r") as f:
+        config_file = config_dir / "ensemble_config.json"
+        if not config_file.exists():
+            raise FileNotFoundError(f"Config file not found: {config_file}")
+
+        with open(config_file, "r") as f:
             self.config = json.load(f)
 
         self.weights = self.config["weights"]
         self.threshold = self.config["threshold"]
 
         # Load dataset
-        self.full_df = pd.read_csv(data_dir / "synthetic_ctgan_data.csv")
+        data_file = data_dir / "synthetic_ctgan_data.csv"
+        if not data_file.exists():
+            raise FileNotFoundError(f"Data file not found: {data_file}")
+
+        self.full_df = pd.read_csv(data_file)
 
         print(f"✅ Models loaded successfully.")
         print(f"   Dataset: {len(self.full_df)} rows")
