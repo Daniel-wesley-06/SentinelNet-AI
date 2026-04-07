@@ -1,0 +1,1 @@
+{"method": "weighted_voting", "weights": {"isolation_forest": 0.4, "oneclass_svm": 0.6}, "threshold": 0.5}

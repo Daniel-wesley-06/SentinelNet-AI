@@ -1,0 +1,3 @@
+﻿IF predictions: [ 1  1 -1  1  1]
+SVM predictions: [-1 -1 -1 -1  1]
+True labels: [1 1 1 1 0]
