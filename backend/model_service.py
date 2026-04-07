@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import joblib
 from pathlib import Path
+import os
 
 
 class ModelService:
@@ -19,19 +20,28 @@ class ModelService:
     """
 
     def __init__(self):
+        print(f"🔍 Current working directory: {os.getcwd()}")
+        print(f"🔍 Model service file location: {Path(__file__).resolve()}")
+        
         base_dir = Path(__file__).resolve().parent
         models_dir = base_dir / "models"
         config_dir = base_dir / "config"
         data_dir = base_dir.parent / "data"
 
-        print(f"🔍 Loading models from: {models_dir}")
-        print(f"🔍 Loading data from: {data_dir}")
-
-        # Check if directories exist
-        if not models_dir.exists():
-            raise FileNotFoundError(f"Models directory not found: {models_dir}")
-        if not data_dir.exists():
-            raise FileNotFoundError(f"Data directory not found: {data_dir}")
+        print(f"🔍 Resolved paths:")
+        print(f"   base_dir: {base_dir}")
+        print(f"   models_dir: {models_dir}")
+        print(f"   config_dir: {config_dir}")
+        print(f"   data_dir: {data_dir}")
+        print(f"🔍 Directory existence:")
+        print(f"   {models_dir}: {models_dir.exists()}")
+        print(f"   {config_dir}: {config_dir.exists()}")
+        print(f"   {data_dir}: {data_dir.exists()}")
+        
+        if models_dir.exists():
+            print(f"   Contents of {models_dir}: {list(models_dir.iterdir())}")
+        if data_dir.exists():
+            print(f"   Contents of {data_dir}: {list(data_dir.iterdir())}")
 
         # Load models with error handling
         try:

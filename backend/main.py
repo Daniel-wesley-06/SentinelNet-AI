@@ -29,19 +29,23 @@ app.add_middleware(
 
 # ─── Load models at startup ───
 model_service: ModelService = None
+startup_error: str = None
 
 
 @app.on_event("startup")
 def load_models():
-    global model_service
+    global model_service, startup_error
     try:
+        print("🔄 Starting up... Loading models...")
         model_service = ModelService()
         print("🚀 SentinelNet AI Backend ready!")
     except Exception as e:
+        startup_error = str(e)
         print(f"❌ ERROR loading models: {e}")
         import traceback
         traceback.print_exc()
-        raise  # Re-raise so we know there's an issue
+        # Don't re-raise - let app continue so we can debug via /health endpoint
+        print("⚠️  App is running but models failed to load. Check /health endpoint.")
 
 
 # ─── Request/Response Models ───
@@ -80,7 +84,13 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "models_loaded": model_service is not None}
+    if model_service is None:
+        return {
+            "status": "degraded",
+            "models_loaded": False,
+            "error": startup_error or "Models not loaded yet"
+        }
+    return {"status": "healthy", "models_loaded": True, "error": None}
 
 
 @app.post("/predict", response_model=PredictResponse)
@@ -94,5 +104,7 @@ def predict(request: PredictRequest):
     4. Combines via weighted voting
     5. Returns predictions + metrics
     """
+    if model_service is None:
+        raise RuntimeError(f"Models not loaded: {startup_error}")
     results = model_service.predict(sample_size=request.sample_size)
     return results
