@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 
 # Backend API URL
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = "https://sentinelnet-ai-30cm.onrender.com"
 
 
 def call_backend_api(sample_size: int = 2000) -> tuple[pd.DataFrame, dict]:
